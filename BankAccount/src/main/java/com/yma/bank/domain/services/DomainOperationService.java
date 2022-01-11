@@ -39,5 +39,10 @@ public class DomainOperationService implements OperationService {
             Operation operation = account.deposit(accountId, newOperationRequest.getAmount());
             operationRepository.saveOperation(operation);
         }
+
+        if (newOperationRequest.getOperationType().equals(OperationTypeEnum.WITHDRAWAL)) {
+            Operation operation = account.withdraw(accountId, newOperationRequest.getAmount());
+            operationRepository.saveOperation(operation);
+        }
     }
 }

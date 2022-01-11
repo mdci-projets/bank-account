@@ -1,5 +1,6 @@
 package com.yma.bank.domain;
 
+import com.yma.bank.domain.services.DomainException;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -60,8 +61,22 @@ public class Account {
      * if the given amount is greater than the balance of this account, a DomainException exception is thrown
      */
     public Operation withdraw(@NonNull Long accountId, @NonNull BigDecimal money) {
-        // TODO
-        return null;
+        BigDecimal balance = this.calculateBalance();
+        if (!mayWithdraw(money, balance)) {
+            throw new DomainException(String.format("Maximum threshold for withdrawing money exceeded:: you want to retrieve %s but your balance is %s!", money, balance));
+        }
+
+        Operation withdrawal = new Operation(
+                null,
+                accountId,
+                LocalDateTime.now(),
+                money.signum() < 0 ? money : money.negate());
+        return this.addOperation(withdrawal);
+    }
+
+    private boolean mayWithdraw(BigDecimal money, BigDecimal balance) {
+        return balance.add(money.negate())
+                .compareTo(BigDecimal.ZERO) >= 0;
     }
 
     /**
@@ -79,15 +94,23 @@ public class Account {
      * Calculates the total balance of the account by adding the operation values to the baseline balance.
      */
     public BigDecimal calculateBalance() {
-        // TODO
-        return null;
+        return this.baseLineBalance.add(this.calculateBalanceOperationsToDisplay());
     }
 
     /**
      * Calculates the balance by summing up the values of all operations displayed.
      */
     public BigDecimal calculateBalanceOperationsToDisplay() {
-        // TODO
-        return null;
+        BigDecimal depositBalance = operationList.stream()
+                .map(Operation::getAmount)
+                .filter(amount -> amount.signum() >= 0)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal withdrawalBalance = operationList.stream()
+                .map(Operation::getAmount)
+                .filter(amount -> amount.signum() < 0)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        return depositBalance.add(withdrawalBalance);
     }
 }
