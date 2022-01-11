@@ -1,6 +1,5 @@
 package com.yma.bank.domain;
 
-import com.yma.bank.domain.services.DomainException;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -46,10 +45,10 @@ public class Account {
      * Tries to deposit a certain amount of money to this account.
      * Creates a new operation with a positive value.
      */
-    public Operation deposit(@NonNull Long accountId, @NonNull BigDecimal money) {
+    public Operation deposit(@NonNull BigDecimal money) {
         Operation deposit = new Operation(
                 null,
-                accountId,
+                this.accountId,
                 LocalDateTime.now(),
                 money.signum() < 0 ? money.negate() : money);
         return this.addOperation(deposit);
@@ -60,7 +59,7 @@ public class Account {
      * Creates a new operation with a negative value.
      * if the given amount is greater than the balance of this account, a DomainException exception is thrown
      */
-    public Operation withdraw(@NonNull Long accountId, @NonNull BigDecimal money) {
+    public Operation withdraw(@NonNull BigDecimal money) {
         BigDecimal balance = this.calculateBalance();
         if (!mayWithdraw(money, balance)) {
             throw new DomainException(String.format("Maximum threshold for withdrawing money exceeded:: you want to retrieve %s but your balance is %s!", money, balance));
@@ -86,6 +85,10 @@ public class Account {
      * @return
      */
     public Operation addOperation(Operation operation) {
+        if (operation == null) {
+            throw new IllegalArgumentException("Missing argument 'operation'");
+        }
+
         this.operationList.add(operation);
         return operation;
     }

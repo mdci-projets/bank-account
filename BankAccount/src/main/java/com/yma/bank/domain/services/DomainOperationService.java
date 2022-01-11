@@ -2,6 +2,7 @@ package com.yma.bank.domain.services;
 
 import com.yma.bank.application.request.NewOperationRequest;
 import com.yma.bank.domain.Account;
+import com.yma.bank.domain.DomainException;
 import com.yma.bank.domain.Operation;
 import com.yma.bank.domain.OperationTypeEnum;
 
@@ -36,12 +37,12 @@ public class DomainOperationService implements OperationService {
                 .orElseThrow(() -> new DomainException(String.format("Account with %s number not found", newOperationRequest.getAccountId())));
 
         if (newOperationRequest.getOperationType().equals(OperationTypeEnum.DEPOSIT)) {
-            Operation operation = account.deposit(accountId, newOperationRequest.getAmount());
+            Operation operation = account.deposit(newOperationRequest.getAmount());
             operationRepository.saveOperation(operation);
         }
 
         if (newOperationRequest.getOperationType().equals(OperationTypeEnum.WITHDRAWAL)) {
-            Operation operation = account.withdraw(accountId, newOperationRequest.getAmount());
+            Operation operation = account.withdraw(newOperationRequest.getAmount());
             operationRepository.saveOperation(operation);
         }
     }

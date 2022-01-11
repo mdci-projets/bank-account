@@ -2,6 +2,7 @@ package com.yma.bank.domain.services;
 
 import com.yma.bank.application.request.NewOperationRequest;
 import com.yma.bank.domain.Account;
+import com.yma.bank.domain.DomainException;
 import com.yma.bank.domain.Operation;
 import com.yma.bank.domain.OperationTypeEnum;
 import org.junit.jupiter.api.Assertions;

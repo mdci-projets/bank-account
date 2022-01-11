@@ -1,6 +1,5 @@
 package com.yma.bank.domain;
 
-import com.yma.bank.domain.services.DomainException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +22,7 @@ public class AccountTest {
                 null);
 
         // When
-        account.deposit(1234567L, BigDecimal.valueOf(200L));
+        account.deposit(BigDecimal.valueOf(200L));
 
         // Then
         Iterable<Operation> expected = Collections.singletonList(new Operation(
@@ -44,7 +43,7 @@ public class AccountTest {
                 null);
 
         // When
-        account.deposit(1234567L, BigDecimal.valueOf(-300L));
+        account.deposit(BigDecimal.valueOf(-300L));
 
         // Then
         Iterable<Operation> expected = Collections.singletonList(new Operation(
@@ -65,7 +64,7 @@ public class AccountTest {
                 null);
 
         // When
-        Operation actual = account.withdraw(1234567L, BigDecimal.valueOf(-200L));
+        Operation actual = account.withdraw(BigDecimal.valueOf(-200L));
 
         // Then
         Iterable<Operation> expected = Collections.singletonList(new Operation(
@@ -86,7 +85,7 @@ public class AccountTest {
                 null);
 
         // When
-        Operation actual = account.withdraw(1234567L, BigDecimal.valueOf(200L));
+        Operation actual = account.withdraw(BigDecimal.valueOf(200L));
 
         // Then
         Iterable<Operation> expected = Collections.singletonList(new Operation(
@@ -107,7 +106,7 @@ public class AccountTest {
                 BigDecimal.valueOf(100L),
                 operationList);
         // When
-        Exception exception = assertThrows(DomainException.class, () -> account.withdraw(1234567L, BigDecimal.valueOf(301L)));
+        Exception exception = assertThrows(DomainException.class, () -> account.withdraw(BigDecimal.valueOf(301L)));
         assertEquals("Maximum threshold for withdrawing money exceeded:: you want to retrieve 301 but your balance is 300!", exception.getMessage());
     }
 
