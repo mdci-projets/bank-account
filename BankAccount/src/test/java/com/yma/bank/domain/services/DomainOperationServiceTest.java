@@ -58,4 +58,24 @@ public class DomainOperationServiceTest {
         Exception exception = assertThrows(DomainException.class, () -> operationService.sendMoney(newOperationRequest));
         assertEquals("Account with %s number not found", exception.getMessage());
     }
+
+    @Test
+    public void sendMoneyWithdrawTest() {
+        // Given
+        final NewOperationRequest newOperationRequest = new NewOperationRequest(1234567L, BigDecimal.valueOf(200L), OperationTypeEnum.WITHDRAWAL);
+        Account account = new Account(newOperationRequest.getAccountId(),
+                BigDecimal.valueOf(300L),
+                new ArrayList<>());
+        when(operationRepository.getAccount(any(Long.class), any(LocalDateTime.class))).thenReturn(account);
+
+        // When
+        operationService.sendMoney(newOperationRequest);
+
+        // Then
+        verify(operationRepository).getAccount(any(Long.class), any(LocalDateTime.class));
+        verify(operationRepository).saveOperation(any(Operation.class));
+        Assertions.assertEquals(BigDecimal.valueOf(-200L), account.getOperationList().get(0).getAmount());
+        Assertions.assertEquals(1234567L, account.getOperationList().get(0).getAccountId());
+    }
+
 }

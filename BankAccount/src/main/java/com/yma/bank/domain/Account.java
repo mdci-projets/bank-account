@@ -54,8 +54,40 @@ public class Account {
         return this.addOperation(deposit);
     }
 
+    /**
+     * Tries to retrieve a certain amount of money from this account.
+     * Creates a new operation with a negative value.
+     * if the given amount is greater than the balance of this account, a DomainException exception is thrown
+     */
+    public Operation withdraw(@NonNull Long accountId, @NonNull BigDecimal money) {
+        // TODO
+        return null;
+    }
+
+    /**
+     * Add the given operation to operations to display
+     *
+     * @param operation
+     * @return
+     */
     public Operation addOperation(Operation operation) {
         this.operationList.add(operation);
         return operation;
+    }
+
+    /**
+     * Calculates the total balance of the account by adding the operation values to the baseline balance.
+     */
+    public BigDecimal calculateBalance() {
+        // TODO
+        return null;
+    }
+
+    /**
+     * Calculates the balance by summing up the values of all operations displayed.
+     */
+    public BigDecimal calculateBalanceOperationsToDisplay() {
+        // TODO
+        return null;
     }
 }
