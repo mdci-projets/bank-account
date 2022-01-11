@@ -45,16 +45,17 @@ public class Account {
      * Tries to deposit a certain amount of money to this account.
      * Creates a new operation with a positive value.
      */
-    public void deposit(@NonNull Long accountId, @NonNull BigDecimal money) {
+    public Operation deposit(@NonNull Long accountId, @NonNull BigDecimal money) {
         Operation deposit = new Operation(
                 null,
                 accountId,
                 LocalDateTime.now(),
                 money.signum() < 0 ? money.negate() : money);
-        this.addOperation(deposit);
+        return this.addOperation(deposit);
     }
 
-    public void addOperation(Operation operation) {
+    public Operation addOperation(Operation operation) {
         this.operationList.add(operation);
+        return operation;
     }
 }

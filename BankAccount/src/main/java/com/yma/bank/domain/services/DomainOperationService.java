@@ -36,13 +36,7 @@ public class DomainOperationService implements OperationService {
                 .orElseThrow(() -> new DomainException(String.format("Account with %s number not found", newOperationRequest.getAccountId())));
 
         if (newOperationRequest.getOperationType().equals(OperationTypeEnum.DEPOSIT)) {
-            account.deposit(accountId, newOperationRequest.getAmount());
-
-            Operation operation = new Operation(
-                    null,
-                    accountId,
-                    LocalDateTime.now(),
-                    newOperationRequest.getAmount());
+            Operation operation = account.deposit(accountId, newOperationRequest.getAmount());
             operationRepository.saveOperation(operation);
         }
     }
