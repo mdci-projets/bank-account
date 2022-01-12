@@ -1,6 +1,7 @@
 package com.yma.bank.domain.services;
 
 import com.yma.bank.application.request.NewOperationRequest;
+import com.yma.bank.application.response.AccountStatementResponse;
 import com.yma.bank.domain.Account;
 import com.yma.bank.domain.DomainException;
 import com.yma.bank.domain.Operation;
@@ -33,7 +34,7 @@ public class DomainOperationService implements OperationService {
                 newOperationRequest.getAccountId(),
                 baselineDate);
 
-        Long accountId = account.getAccountId()
+        account.getAccountId()
                 .orElseThrow(() -> new DomainException(String.format("Account with %s number not found", newOperationRequest.getAccountId())));
 
         if (newOperationRequest.getOperationType().equals(OperationTypeEnum.DEPOSIT)) {
@@ -45,5 +46,10 @@ public class DomainOperationService implements OperationService {
             Operation operation = account.withdraw(newOperationRequest.getAmount());
             operationRepository.saveOperation(operation);
         }
+    }
+
+    @Override
+    public AccountStatementResponse getAccountStatement(Long accountId, LocalDateTime baselineDate) {
+        return null;
     }
 }
