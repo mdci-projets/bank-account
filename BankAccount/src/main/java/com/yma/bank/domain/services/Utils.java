@@ -19,7 +19,9 @@ public class Utils {
      * @return
      */
     public static AccountStatementResponse generateAccountStatement(Account account) {
-        return new AccountStatementResponse(createStatementLineFromAccount(account), account.getAccountId().get());
+        Long accountId = account.getAccountId()
+                .orElseThrow(() -> new IllegalStateException("expected account ID not to be empty"));
+        return new AccountStatementResponse(createStatementLineFromAccount(account), accountId);
     }
 
     private static List<StatementLine> createStatementLineFromAccount(
