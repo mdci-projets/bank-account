@@ -48,8 +48,16 @@ public class DomainOperationService implements OperationService {
         }
     }
 
+    /**
+     * Get account statement since the given date for a given account id
+     *
+     * @param accountId
+     * @param baselineDate
+     * @return
+     */
     @Override
     public AccountStatementResponse getAccountStatement(Long accountId, LocalDateTime baselineDate) {
-        return null;
+        Account account = operationRepository.getAccount(accountId, baselineDate);
+        return Utils.generateAccountStatement(account);
     }
 }
