@@ -32,10 +32,12 @@ public class Utils {
         operationList.sort(Comparator.comparing(Operation::getTimestamp).reversed());
         BigDecimal balance = account.getBaseLineBalance().signum() == 0 ? account.calculateBalanceOperationsToDisplay() : account.getBaseLineBalance();
 
-        statementLineList.add(new StatementLine(operationList.get(0).getTimestamp(), operationList.get(0).getAmount(), balance));
-        for (int i = 1; i < operationList.size(); i++) {
-            balance = balance.subtract(operationList.get(i - 1).getAmount());
-            statementLineList.add(new StatementLine(operationList.get(i).getTimestamp(), operationList.get(i).getAmount(), balance));
+        if (!operationList.isEmpty()) {
+            statementLineList.add(new StatementLine(operationList.get(0).getTimestamp(), operationList.get(0).getAmount(), balance));
+            for (int i = 1; i < operationList.size(); i++) {
+                balance = balance.subtract(operationList.get(i - 1).getAmount());
+                statementLineList.add(new StatementLine(operationList.get(i).getTimestamp(), operationList.get(i).getAmount(), balance));
+            }
         }
 
         return statementLineList;
