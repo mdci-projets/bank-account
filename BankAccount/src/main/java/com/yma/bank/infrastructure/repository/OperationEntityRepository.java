@@ -32,5 +32,4 @@ public interface OperationEntityRepository extends JpaRepository<OperationEntity
     Long getWithdrawalBalanceUntil(
             @Param("accountId") Long accountId,
             @Param("until") LocalDateTime until);
-
 }
