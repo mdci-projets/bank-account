@@ -3,6 +3,7 @@ package com.yma.bank.domain.services;
 import com.yma.bank.application.response.AccountStatementResponse;
 import com.yma.bank.application.response.StatementLine;
 import com.yma.bank.domain.Account;
+import com.yma.bank.domain.DomainException;
 import com.yma.bank.domain.Operation;
 
 import java.math.BigDecimal;
@@ -20,7 +21,7 @@ public class Utils {
      */
     public static AccountStatementResponse generateAccountStatement(Account account) {
         Long accountId = account.getAccountId()
-                .orElseThrow(() -> new IllegalStateException("expected account ID not to be empty"));
+                .orElseThrow(() -> new DomainException("expected account ID not to be empty"));
         return new AccountStatementResponse(createStatementLineFromAccount(account), accountId);
     }
 

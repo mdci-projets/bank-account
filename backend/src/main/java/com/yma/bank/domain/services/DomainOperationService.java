@@ -5,11 +5,13 @@ import com.yma.bank.application.response.AccountStatementResponse;
 import com.yma.bank.domain.Account;
 import com.yma.bank.domain.DomainException;
 import com.yma.bank.domain.Operation;
-import com.yma.bank.domain.OperationTypeEnum;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 
 public class DomainOperationService implements OperationService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DomainOperationService.class);
 
     private final OperationRepositoryExtended operationRepository;
 
@@ -27,8 +29,10 @@ public class DomainOperationService implements OperationService {
     @Override
     public void sendMoney(NewOperationRequest newOperationRequest) {
         if (newOperationRequest == null) {
-            throw new IllegalArgumentException("Missing argument 'newOperationRequest'");
+            throw new DomainException("Invalid request: newOperationRequest is null");
         }
+        LOGGER.info("Processing transaction for account ID: {}", newOperationRequest.getAccountId());
+
         LocalDateTime baselineDate = LocalDateTime.now().minusDays(10);
         Account account = operationRepository.getAccount(
                 newOperationRequest.getAccountId(),
@@ -37,15 +41,19 @@ public class DomainOperationService implements OperationService {
         account.getAccountId()
                 .orElseThrow(() -> new DomainException(String.format("Account with %s number not found", newOperationRequest.getAccountId())));
 
-        if (newOperationRequest.getOperationType().equals(OperationTypeEnum.DEPOSIT)) {
-            Operation operation = account.deposit(newOperationRequest.getAmount());
-            operationRepository.saveOperation(operation);
+        switch (newOperationRequest.getOperationType()) {
+            case DEPOSIT -> {
+                Operation operation = account.deposit(newOperationRequest.getAmount());
+                operationRepository.saveOperation(operation);
+            }
+            case WITHDRAWAL -> {
+                Operation operation = account.withdraw(newOperationRequest.getAmount());
+                operationRepository.saveOperation(operation);
+            }
+            default -> throw new DomainException("Invalid operation type : " + newOperationRequest.getOperationType());
         }
 
-        if (newOperationRequest.getOperationType().equals(OperationTypeEnum.WITHDRAWAL)) {
-            Operation operation = account.withdraw(newOperationRequest.getAmount());
-            operationRepository.saveOperation(operation);
-        }
+        LOGGER.info("Operation successfully recorded for account ID {}", newOperationRequest.getAccountId());
     }
 
     /**

@@ -9,6 +9,10 @@ import com.yma.bank.domain.OperationTypeEnum;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -21,16 +25,46 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 public class DomainOperationServiceTest {
 
-    private OperationService operationService;
+    @InjectMocks
+    private DomainOperationService operationService;
 
+    @Mock
     private OperationRepositoryExtended operationRepository;
+
+    private NewOperationRequest request;
+    private Account account;
 
     @BeforeEach
     void setUp() {
-        operationRepository = mock(OperationRepositoryExtended.class);
-        operationService = new DomainOperationService(operationRepository);
+        request = new NewOperationRequest(1L, new BigDecimal("100"), OperationTypeEnum.DEPOSIT);
+        account = new Account(1L, new BigDecimal("500.00"), new ArrayList<>());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenRequestIsNull() {
+        Exception exception = assertThrows(DomainException.class, () -> operationService.sendMoney(null));
+        assertEquals("Invalid request: newOperationRequest is null", exception.getMessage());
+    }
+
+    @Test
+    void shouldThrowDomainExceptionWhenAccountNotFound() {
+        when(operationRepository.getAccount(anyLong(), any())).thenThrow(new DomainException("Compte introuvable"));
+
+        Exception exception = assertThrows(DomainException.class, () -> operationService.sendMoney(request));
+        assertEquals("Compte introuvable", exception.getMessage());
+    }
+
+    @Test
+    void shouldProcessDepositSuccessfully() {
+        when(operationRepository.getAccount(anyLong(), any())).thenReturn(account);
+
+        operationService.sendMoney(request);
+
+        verify(operationRepository, times(1)).getAccount(anyLong(), any());
+        verify(operationRepository, times(1)).saveOperation(any(Operation.class));
     }
 
     @Test
