@@ -10,12 +10,12 @@ import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 
-public class DomainOperationService implements OperationService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DomainOperationService.class);
+public class OperationServiceImpl implements OperationService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(OperationServiceImpl.class);
 
-    private final OperationRepositoryExtended operationRepository;
+    private final OperationRepository operationRepository;
 
-    public DomainOperationService(final OperationRepositoryExtended operationRepository) {
+    public OperationServiceImpl(final OperationRepository operationRepository) {
         this.operationRepository = operationRepository;
     }
 

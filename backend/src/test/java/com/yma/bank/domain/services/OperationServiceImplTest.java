@@ -26,13 +26,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class DomainOperationServiceTest {
+public class OperationServiceImplTest {
 
     @InjectMocks
-    private DomainOperationService operationService;
+    private OperationServiceImpl operationService;
 
     @Mock
-    private OperationRepositoryExtended operationRepository;
+    private OperationRepository operationRepository;
 
     private NewOperationRequest request;
     private Account account;

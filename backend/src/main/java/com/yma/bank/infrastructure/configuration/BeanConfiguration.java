@@ -1,8 +1,8 @@
 package com.yma.bank.infrastructure.configuration;
 
 import com.yma.bank.BankApplication;
-import com.yma.bank.domain.services.DomainOperationService;
-import com.yma.bank.domain.services.OperationRepositoryExtended;
+import com.yma.bank.domain.services.OperationServiceImpl;
+import com.yma.bank.domain.services.OperationRepository;
 import com.yma.bank.domain.services.OperationService;
 
 import io.swagger.v3.oas.models.ExternalDocumentation;
@@ -19,8 +19,8 @@ import org.springframework.context.annotation.Configuration;
 public class BeanConfiguration {
 
     @Bean
-    OperationService operationService(final OperationRepositoryExtended operationRepositoryExtended) {
-        return new DomainOperationService(operationRepositoryExtended);
+    OperationService operationService(final OperationRepository operationRepository) {
+        return new OperationServiceImpl(operationRepository);
     }
 
     @Bean

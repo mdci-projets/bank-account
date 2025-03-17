@@ -2,7 +2,7 @@ package com.yma.bank.infrastructure.repository;
 
 import com.yma.bank.domain.Account;
 import com.yma.bank.domain.Operation;
-import com.yma.bank.domain.services.OperationRepositoryExtended;
+import com.yma.bank.domain.services.OperationRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,13 +21,13 @@ import java.util.List;
 @ContextConfiguration(classes = {RepositoryTestConfiguration.class})
 @DataJpaTest
 @ActiveProfiles("test")
-public class OperationRepositoryExtendedImplTest {
+public class OperationRepositoryImplTest {
 
     @Autowired
     private TestEntityManager entityManager;
 
     @Autowired
-    private OperationRepositoryExtended repositoryExtended;
+    private OperationRepository repositoryExtended;
 
     @Autowired
     private OperationEntityRepository operationRepository;

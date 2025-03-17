@@ -5,7 +5,7 @@ import com.yma.bank.domain.Operation;
 
 import java.time.LocalDateTime;
 
-public interface OperationRepositoryExtended {
+public interface OperationRepository {
     void saveOperation(Operation operation);
 
     Account getAccount(Long accountId, LocalDateTime baselineDate);
