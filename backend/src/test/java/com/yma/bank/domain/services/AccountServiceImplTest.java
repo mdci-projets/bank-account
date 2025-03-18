@@ -2,6 +2,7 @@ package com.yma.bank.domain.services;
 
 import com.yma.bank.application.request.NewOperationRequest;
 import com.yma.bank.domain.*;
+import com.yma.bank.infrastructure.repository.AccountRepository;
 import com.yma.bank.infrastructure.repository.OperationMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -21,16 +23,19 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class OperationServiceImplTest {
+public class AccountServiceImplTest {
 
     @InjectMocks
-    private OperationServiceImpl operationService;
+    private AccountServiceImpl accountService;
 
     @Mock
     private OperationRepository operationRepository;
 
     @Mock
     private OperationHistoryRepository operationHistoryRepository;
+
+    @Mock
+    private AccountRepository accountRepository;
 
     private OperationMapper operationMapper;
 
@@ -39,31 +44,31 @@ public class OperationServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        operationMapper = new OperationMapper();
-        operationService = new OperationServiceImpl(operationRepository, operationHistoryRepository, operationMapper);
+        OperationMapper operationMapper = new OperationMapper();
+        accountService = new AccountServiceImpl(operationRepository, operationHistoryRepository, accountRepository, operationMapper);
         request = new NewOperationRequest(1L, new BigDecimal("100"), OperationTypeEnum.DEPOSIT);
         account = new Account(1L, new BigDecimal("500.00"), new ArrayList<>());
     }
 
     @Test
     void shouldThrowExceptionWhenRequestIsNull() {
-        Exception exception = assertThrows(DomainException.class, () -> operationService.sendMoney(null));
+        Exception exception = assertThrows(DomainException.class, () -> accountService.sendMoney(null));
         assertEquals("Invalid request: newOperationRequest is null", exception.getMessage());
     }
 
     @Test
     void shouldThrowDomainExceptionWhenAccountNotFound() {
-        when(operationRepository.getAccount(anyLong(), any())).thenThrow(new DomainException("Compte introuvable"));
+        when(operationRepository.getAccount(anyLong(), any())).thenThrow(new DomainException("Account not found"));
 
-        Exception exception = assertThrows(DomainException.class, () -> operationService.sendMoney(request));
-        assertEquals("Compte introuvable", exception.getMessage());
+        Exception exception = assertThrows(DomainException.class, () -> accountService.sendMoney(request));
+        assertEquals("Account not found", exception.getMessage());
     }
 
     @Test
     void shouldProcessDepositSuccessfully() {
         when(operationRepository.getAccount(anyLong(), any())).thenReturn(account);
 
-        operationService.sendMoney(request);
+        accountService.sendMoney(request);
 
         verify(operationRepository, times(1)).getAccount(anyLong(), any());
         verify(operationRepository, times(1)).saveOperation(any(Operation.class));
@@ -80,7 +85,7 @@ public class OperationServiceImplTest {
         when(operationRepository.getAccount(any(Long.class), any(LocalDateTime.class))).thenReturn(account);
 
         // When
-        operationService.sendMoney(newOperationRequest);
+        accountService.sendMoney(newOperationRequest);
 
         // Then
         verify(operationRepository).getAccount(any(Long.class), any(LocalDateTime.class));
@@ -97,7 +102,7 @@ public class OperationServiceImplTest {
         when(operationRepository.getAccount(eq(1234567L), any(LocalDateTime.class))).thenThrow(new DomainException("Account with %s number not found"));
 
         // When
-        Exception exception = assertThrows(DomainException.class, () -> operationService.sendMoney(newOperationRequest));
+        Exception exception = assertThrows(DomainException.class, () -> accountService.sendMoney(newOperationRequest));
         assertEquals("Account with %s number not found", exception.getMessage());
     }
 
@@ -111,7 +116,7 @@ public class OperationServiceImplTest {
         when(operationRepository.getAccount(any(Long.class), any(LocalDateTime.class))).thenReturn(account);
 
         // When
-        operationService.sendMoney(newOperationRequest);
+        accountService.sendMoney(newOperationRequest);
 
         // Then
         verify(operationRepository).getAccount(any(Long.class), any(LocalDateTime.class));
@@ -120,6 +125,27 @@ public class OperationServiceImplTest {
         Assertions.assertEquals(BigDecimal.valueOf(200L), account.getOperationList().get(0).getAmount());
         Assertions.assertEquals(OperationTypeEnum.WITHDRAWAL, account.getOperationList().get(0).getOperationType());
         Assertions.assertEquals(1234567L, account.getOperationList().get(0).getAccountId());
+    }
+
+    @Test
+    void shouldReturnAccountWhenExists() {
+        LocalDateTime baseLineDate = LocalDateTime.now();
+        Account expectedAccount = new Account(1234567L, new BigDecimal("500.00"), null);
+        when(accountRepository.getAccount(1234567L, baseLineDate)).thenReturn(Optional.of(expectedAccount));
+
+        Account retrievedAccount = accountService.getAccount(1234567L, baseLineDate);
+
+        assertEquals(1234567L, retrievedAccount.getAccountId().get());
+        assertEquals(new BigDecimal("500.00"), retrievedAccount.getBaseLineBalance());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenAccountNotFound() {
+        LocalDateTime baseLineDate = LocalDateTime.now();
+        when(accountRepository.getAccount(1234567L, baseLineDate)).thenReturn(Optional.empty());
+
+        Exception exception = assertThrows(DomainException.class, () -> accountService.getAccount(1234567L, baseLineDate));
+        assertEquals("Account not found with ID: 1234567", exception.getMessage());
     }
 
 }
