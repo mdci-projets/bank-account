@@ -1,10 +1,9 @@
 package com.yma.bank.infrastructure.configuration;
 
 import com.yma.bank.BankApplication;
-import com.yma.bank.domain.services.OperationServiceImpl;
-import com.yma.bank.domain.services.OperationRepository;
-import com.yma.bank.domain.services.OperationService;
+import com.yma.bank.domain.services.*;
 
+import com.yma.bank.infrastructure.repository.OperationMapper;
 import io.swagger.v3.oas.models.ExternalDocumentation;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
@@ -19,8 +18,18 @@ import org.springframework.context.annotation.Configuration;
 public class BeanConfiguration {
 
     @Bean
-    OperationService operationService(final OperationRepository operationRepository) {
-        return new OperationServiceImpl(operationRepository);
+    OperationService operationService(final OperationRepository operationRepository, final OperationHistoryRepository operationHistoryRepository, final OperationMapper operationMapper) {
+        return new OperationServiceImpl(operationRepository, operationHistoryRepository, operationMapper);
+    }
+
+    @Bean
+    public StatementDomainService statementDomainService() {
+        return new StatementDomainService();
+    }
+
+    @Bean
+    StatementService statementService(final OperationHistoryRepository operationHistoryRepository, final StatementDomainService statementDomainService) {
+        return new StatementServiceImpl(operationHistoryRepository, statementDomainService);
     }
 
     @Bean

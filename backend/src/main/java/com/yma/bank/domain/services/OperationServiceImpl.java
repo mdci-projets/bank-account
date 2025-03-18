@@ -1,10 +1,10 @@
 package com.yma.bank.domain.services;
 
 import com.yma.bank.application.request.NewOperationRequest;
-import com.yma.bank.application.response.AccountStatementResponse;
 import com.yma.bank.domain.Account;
 import com.yma.bank.domain.DomainException;
 import com.yma.bank.domain.Operation;
+import com.yma.bank.infrastructure.repository.OperationMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,8 +15,14 @@ public class OperationServiceImpl implements OperationService {
 
     private final OperationRepository operationRepository;
 
-    public OperationServiceImpl(final OperationRepository operationRepository) {
+    private final OperationHistoryRepository operationHistoryRepository;
+
+    private final OperationMapper operationMapper;
+
+    public OperationServiceImpl(OperationRepository operationRepository, OperationHistoryRepository operationHistoryRepository, OperationMapper operationMapper) {
         this.operationRepository = operationRepository;
+        this.operationHistoryRepository = operationHistoryRepository;
+        this.operationMapper = operationMapper;
     }
 
     /**
@@ -41,31 +47,16 @@ public class OperationServiceImpl implements OperationService {
         account.getAccountId()
                 .orElseThrow(() -> new DomainException(String.format("Account with %s number not found", newOperationRequest.getAccountId())));
 
+        Operation operation;
         switch (newOperationRequest.getOperationType()) {
-            case DEPOSIT -> {
-                Operation operation = account.deposit(newOperationRequest.getAmount());
-                operationRepository.saveOperation(operation);
-            }
-            case WITHDRAWAL -> {
-                Operation operation = account.withdraw(newOperationRequest.getAmount());
-                operationRepository.saveOperation(operation);
-            }
+            case DEPOSIT -> operation = account.deposit(newOperationRequest.getAmount());
+            case WITHDRAWAL -> operation = account.withdraw(newOperationRequest.getAmount());
             default -> throw new DomainException("Invalid operation type : " + newOperationRequest.getOperationType());
         }
 
-        LOGGER.info("Operation successfully recorded for account ID {}", newOperationRequest.getAccountId());
-    }
+        operationRepository.saveOperation(operation);
+        operationHistoryRepository.save(operationMapper.toHistory(operation));
 
-    /**
-     * Get account statement since the given date for a given account id
-     *
-     * @param accountId
-     * @param baselineDate
-     * @return
-     */
-    @Override
-    public AccountStatementResponse getAccountStatement(Long accountId, LocalDateTime baselineDate) {
-        Account account = operationRepository.getAccount(accountId, baselineDate);
-        return Utils.generateAccountStatement(account);
+        LOGGER.info("Operation successfully recorded for account ID {}", newOperationRequest.getAccountId());
     }
 }
