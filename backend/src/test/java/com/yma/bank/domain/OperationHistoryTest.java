@@ -12,7 +12,7 @@ class OperationHistoryTest {
     @Test
     void shouldCreateOperationHistorySuccessfully() {
         OperationHistory operationHistory = new OperationHistory(
-                1L, 1001L, new BigDecimal("100.00"), OperationTypeEnum.DEPOSIT, LocalDateTime.now()
+                1L, 1001L, LocalDateTime.now(), new BigDecimal("100.00"), OperationTypeEnum.DEPOSIT
         );
 
         assertNotNull(operationHistory);
@@ -25,7 +25,7 @@ class OperationHistoryTest {
     @Test
     void shouldNotAllowModificationAfterCreation() {
         OperationHistory operationHistory = new OperationHistory(
-                1L, 1001L, new BigDecimal("100.00"), OperationTypeEnum.DEPOSIT, LocalDateTime.now()
+                1L, 1001L, LocalDateTime.now(), new BigDecimal("100.00"), OperationTypeEnum.DEPOSIT
         );
 
         assertEquals(new BigDecimal("100.00"), operationHistory.getAmount());

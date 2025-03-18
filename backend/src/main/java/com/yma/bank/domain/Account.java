@@ -46,11 +46,16 @@ public class Account {
      * Creates a new operation with a positive value.
      */
     public Operation deposit(@NonNull BigDecimal money) {
+        if (money.signum() <= 0) {
+            throw new DomainException("The deposit amount must be positive.");
+        }
         Operation deposit = new Operation(
                 null,
                 this.accountId,
                 LocalDateTime.now(),
-                money.signum() < 0 ? money.negate() : money);
+                money,
+                OperationTypeEnum.DEPOSIT
+                );
         return this.addOperation(deposit);
     }
 
@@ -62,20 +67,21 @@ public class Account {
     public Operation withdraw(@NonNull BigDecimal money) {
         BigDecimal balance = this.calculateBalance();
         if (!mayWithdraw(money, balance)) {
-            throw new DomainException(String.format("Maximum threshold for withdrawing money exceeded:: you want to retrieve %s but your balance is %s!", money, balance));
+            throw new DomainException(String.format("Insufficient balance: Withdrawal of %s is not possible, current balance: %s", money, balance));
         }
 
         Operation withdrawal = new Operation(
                 null,
                 accountId,
                 LocalDateTime.now(),
-                money.signum() < 0 ? money : money.negate());
+                money,
+                OperationTypeEnum.WITHDRAWAL
+                );
         return this.addOperation(withdrawal);
     }
 
     private boolean mayWithdraw(BigDecimal money, BigDecimal balance) {
-        return balance.add(money.negate())
-                .compareTo(BigDecimal.ZERO) >= 0;
+        return balance.compareTo(money) >= 0;
     }
 
     /**
@@ -105,15 +111,15 @@ public class Account {
      */
     public BigDecimal calculateBalanceOperationsToDisplay() {
         BigDecimal depositBalance = operationList.stream()
+                .filter(operation -> operation.getOperationType() == OperationTypeEnum.DEPOSIT)
                 .map(Operation::getAmount)
-                .filter(amount -> amount.signum() >= 0)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         BigDecimal withdrawalBalance = operationList.stream()
+                .filter(operation -> operation.getOperationType() == OperationTypeEnum.WITHDRAWAL)
                 .map(Operation::getAmount)
-                .filter(amount -> amount.signum() < 0)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        return depositBalance.add(withdrawalBalance);
+        return depositBalance.add(withdrawalBalance.negate());
     }
 }

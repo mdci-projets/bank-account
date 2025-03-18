@@ -2,6 +2,7 @@ package com.yma.bank.infrastructure.repository;
 
 import com.yma.bank.domain.Account;
 import com.yma.bank.domain.Operation;
+import com.yma.bank.domain.OperationTypeEnum;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -32,7 +33,9 @@ public class AccountMapper {
                     operationEntity.getId(),
                     operationEntity.getAccountId(),
                     operationEntity.getTimestamp(),
-                    operationEntity.getAmount()));
+                    operationEntity.getAmount(),
+                    OperationTypeEnum.valueOf(operationEntity.getOperationType())
+                    ));
         }
 
         return mappedOperationList;
@@ -43,6 +46,7 @@ public class AccountMapper {
                 operation.getId(),
                 operation.getAccountId(),
                 operation.getTimestamp(),
-                operation.getAmount());
+                operation.getAmount(),
+                operation.getOperationType().name());
     }
 }

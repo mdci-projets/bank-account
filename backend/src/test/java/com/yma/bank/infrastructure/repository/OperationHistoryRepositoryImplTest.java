@@ -24,7 +24,7 @@ class OperationHistoryRepositoryImplTest {
     @Test
     void shouldSaveOperationHistorySuccessfully() {
         OperationHistory operation = new OperationHistory(
-                null, 1001L, new BigDecimal("200.00"), OperationTypeEnum.DEPOSIT, LocalDateTime.now()
+                null, 1001L, LocalDateTime.now(), new BigDecimal("200.00"), OperationTypeEnum.DEPOSIT
         );
 
         repository.save(operation);
@@ -37,8 +37,8 @@ class OperationHistoryRepositoryImplTest {
 
     @Test
     void shouldRetrieveMultipleOperationsForAccount() {
-        repository.save(new OperationHistory(null, 1001L, new BigDecimal("150.00"), OperationTypeEnum.WITHDRAWAL, LocalDateTime.now().minusDays(2)));
-        repository.save(new OperationHistory(null, 1001L, new BigDecimal("250.00"), OperationTypeEnum.DEPOSIT, LocalDateTime.now().minusDays(1)));
+        repository.save(new OperationHistory(null, 1001L, LocalDateTime.now().minusDays(2), new BigDecimal("150.00"), OperationTypeEnum.WITHDRAWAL));
+        repository.save(new OperationHistory(null, 1001L, LocalDateTime.now().minusDays(1), new BigDecimal("250.00"), OperationTypeEnum.DEPOSIT));
 
         List<OperationHistory> history = repository.findByAccountId(1001L);
 

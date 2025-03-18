@@ -12,22 +12,18 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "operation_history")
+@Getter
 public class OperationHistoryEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Getter
     private Long id;
 
-    @Getter
     private Long accountId;
 
-    @Getter
     private BigDecimal amount;
 
-    @Getter
     private String operationType;
 
-    @Getter
     private LocalDateTime timestamp;
 }

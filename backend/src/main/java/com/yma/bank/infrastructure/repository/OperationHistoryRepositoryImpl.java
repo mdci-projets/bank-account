@@ -1,9 +1,9 @@
 package com.yma.bank.infrastructure.repository;
 
-import com.yma.bank.domain.OperationTypeEnum;
 import com.yma.bank.domain.OperationHistory;
 import com.yma.bank.domain.services.OperationHistoryRepository;
 import org.springframework.stereotype.Repository;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -12,13 +12,16 @@ public class OperationHistoryRepositoryImpl implements OperationHistoryRepositor
 
     private final OperationHistoryEntityRepository repository;
 
-    public OperationHistoryRepositoryImpl(OperationHistoryEntityRepository repository) {
+    private final OperationHistoryMapper mapper;
+
+    public OperationHistoryRepositoryImpl(OperationHistoryEntityRepository repository, OperationHistoryMapper mapper) {
         this.repository = repository;
+        this.mapper = mapper;
     }
 
     @Override
     public void save(OperationHistory operationHistory) {
-        OperationHistoryEntity entity = toEntity(operationHistory);
+        OperationHistoryEntity entity = mapper.toEntity(operationHistory);
         repository.save(entity);
     }
 
@@ -26,27 +29,7 @@ public class OperationHistoryRepositoryImpl implements OperationHistoryRepositor
     public List<OperationHistory> findByAccountId(Long accountId) {
         return repository.findByAccountId(accountId)
                 .stream()
-                .map(this::toDomain)
+                .map(mapper::toDomain)
                 .collect(Collectors.toList());
-    }
-
-    public OperationHistoryEntity toEntity(OperationHistory operation) {
-        return new OperationHistoryEntity(
-                operation.getId(),
-                operation.getAccountId(),
-                operation.getAmount(),
-                operation.getOperationType().name(),
-                operation.getTimestamp()
-        );
-    }
-
-    public OperationHistory toDomain(OperationHistoryEntity entity) {
-        return new OperationHistory(
-                entity.getId(),
-                entity.getAccountId(),
-                entity.getAmount(),
-                OperationTypeEnum.valueOf(entity.getOperationType()),
-                entity.getTimestamp()
-        );
     }
 }

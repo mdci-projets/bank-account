@@ -2,6 +2,7 @@ package com.yma.bank.infrastructure.repository;
 
 import com.yma.bank.domain.Account;
 import com.yma.bank.domain.Operation;
+import com.yma.bank.domain.OperationTypeEnum;
 import com.yma.bank.domain.services.OperationRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -37,7 +38,7 @@ public class OperationRepositoryImplTest {
     @Test
     public void saveOperationTest() {
         // When
-        repositoryExtended.saveOperation(new Operation(200L, 123456L, baseLineDate, BigDecimal.valueOf(500L)));
+        repositoryExtended.saveOperation(new Operation(200L, 123456L, baseLineDate, BigDecimal.valueOf(500L), OperationTypeEnum.DEPOSIT));
 
         //Then
         List<OperationEntity> actual = operationRepository.findAll();
@@ -57,14 +58,14 @@ public class OperationRepositoryImplTest {
 
         // Then
         Assertions.assertEquals(BigDecimal.valueOf(200L), actual.calculateBalanceOperationsToDisplay());
-        Assertions.assertEquals(BigDecimal.valueOf(900L), actual.getBaseLineBalance());
+        Assertions.assertEquals(BigDecimal.valueOf(700L), actual.getBaseLineBalance());
     }
 
     private void createData() {
         entityManager.persistAndFlush(new AccountEntity(null, 123456L));
-        entityManager.persistAndFlush(new OperationEntity(null, 123456L, baseLineDate.minusDays(2), BigDecimal.valueOf(800L)));
-        entityManager.persistAndFlush(new OperationEntity(null, 123456L, baseLineDate.minusDays(1), BigDecimal.valueOf(-100L)));
-        entityManager.persistAndFlush(new OperationEntity(null, 123456L, baseLineDate.plusDays(2), BigDecimal.valueOf(-200L)));
-        entityManager.persistAndFlush(new OperationEntity(null, 123456L, baseLineDate.plusDays(3), BigDecimal.valueOf(400L)));
+        entityManager.persistAndFlush(new OperationEntity(null, 123456L, baseLineDate.minusDays(2), BigDecimal.valueOf(800L), OperationTypeEnum.DEPOSIT.name()));
+        entityManager.persistAndFlush(new OperationEntity(null, 123456L, baseLineDate.minusDays(1), BigDecimal.valueOf(100L), OperationTypeEnum.WITHDRAWAL.name()));
+        entityManager.persistAndFlush(new OperationEntity(null, 123456L, baseLineDate.plusDays(2), BigDecimal.valueOf(200L), OperationTypeEnum.WITHDRAWAL.name()));
+        entityManager.persistAndFlush(new OperationEntity(null, 123456L, baseLineDate.plusDays(3), BigDecimal.valueOf(400L), OperationTypeEnum.DEPOSIT.name()));
     }
 }

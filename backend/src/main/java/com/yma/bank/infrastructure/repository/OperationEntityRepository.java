@@ -19,7 +19,7 @@ public interface OperationEntityRepository extends JpaRepository<OperationEntity
 
     @Query("select sum(oe.amount) from OperationEntity oe " +
             "where oe.accountId = :accountId " +
-            "and oe.amount >=0 " +
+            "and oe.operationType = 'DEPOSIT' " +
             "and oe.timestamp < :until")
     Long getDepositBalanceUntil(
             @Param("accountId") Long accountId,
@@ -27,7 +27,7 @@ public interface OperationEntityRepository extends JpaRepository<OperationEntity
 
     @Query("select sum(oe.amount) from OperationEntity oe " +
             "where oe.accountId = :accountId " +
-            "and oe.amount <0 " +
+            "and oe.operationType = 'WITHDRAWAL' " +
             "and oe.timestamp < :until")
     Long getWithdrawalBalanceUntil(
             @Param("accountId") Long accountId,

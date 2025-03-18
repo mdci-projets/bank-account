@@ -1,24 +1,30 @@
 package com.yma.bank.domain;
 
 import lombok.Getter;
-import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Getter
-public final class OperationHistory {
-    private final Long id;
-    private final Long accountId;
-    private final BigDecimal amount;
-    private final OperationTypeEnum operationType;
-    private final LocalDateTime timestamp;
+public final class OperationHistory extends BaseOperation {
+    public OperationHistory(Long id, Long accountId, LocalDateTime timestamp, BigDecimal amount, OperationTypeEnum operationType) {
+        super(id, accountId, timestamp, amount, operationType);
+    }
 
-    public OperationHistory(Long id, Long accountId, BigDecimal amount, OperationTypeEnum operationType, LocalDateTime timestamp) {
-        this.id = id;
-        this.accountId = accountId;
-        this.amount = amount;
-        this.operationType = operationType;
-        this.timestamp = timestamp;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        OperationHistory operation = (OperationHistory) o;
+        return Objects.equals(super.getId(), operation.getId())
+                && Objects.equals(super.getAmount(), operation.getAmount())
+                && Objects.equals(super.getTimestamp(), operation.getTimestamp())
+                && Objects.equals(super.getOperationType(), operation.getOperationType());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.getId(), super.getAmount(), super.getTimestamp(), super.getOperationType());
     }
 }
