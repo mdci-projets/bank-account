@@ -15,28 +15,27 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "operation")
+@Getter
 public class OperationEntity {
 
     @Id
     @GeneratedValue
-    @Getter
     private Long id;
 
     /**
      * The account that owns this activity.
      */
-    @Getter
     private Long accountId;
 
     /**
      * The timestamp of the activity.
      */
-    @Getter
     private LocalDateTime timestamp;
 
     /**
      * The money that was transferred between the accounts.
      */
-    @Getter
     private BigDecimal amount;
+
+    private String operationType;
 }

@@ -5,6 +5,7 @@ import com.yma.bank.application.response.StatementLine;
 import com.yma.bank.domain.Account;
 import com.yma.bank.domain.DomainException;
 import com.yma.bank.domain.Operation;
+import com.yma.bank.domain.OperationTypeEnum;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -34,10 +35,15 @@ public class Utils {
         BigDecimal balance = account.getBaseLineBalance().signum() == 0 ? account.calculateBalanceOperationsToDisplay() : account.getBaseLineBalance();
 
         if (!operationList.isEmpty()) {
-            statementLineList.add(new StatementLine(operationList.get(0).getTimestamp(), operationList.get(0).getAmount(), balance));
-            for (int i = 1; i < operationList.size(); i++) {
-                balance = balance.subtract(operationList.get(i - 1).getAmount());
-                statementLineList.add(new StatementLine(operationList.get(i).getTimestamp(), operationList.get(i).getAmount(), balance));
+            for (Operation operation : operationList) {
+                if (operation.getOperationType() == OperationTypeEnum.WITHDRAWAL) {
+                    balance = balance.subtract(operation.getAmount().abs());
+                } else {
+                    balance = balance.add(operation.getAmount().abs());
+                }
+                statementLineList.add(new StatementLine(operation.getTimestamp(),
+                        operation.getOperationType() == OperationTypeEnum.WITHDRAWAL ? operation.getAmount().negate() : operation.getAmount(),
+                        balance));
             }
         }
 

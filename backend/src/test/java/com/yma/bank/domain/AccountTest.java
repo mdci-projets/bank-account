@@ -29,7 +29,8 @@ public class AccountTest {
                 null,
                 1234567L,
                 account.getOperationList().get(0).getTimestamp(),
-                BigDecimal.valueOf(200L)));
+                BigDecimal.valueOf(200L),
+                OperationTypeEnum.DEPOSIT));
         Assertions.assertIterableEquals(expected, account.getOperationList());
         Assertions.assertEquals(BigDecimal.valueOf(200L), account.getOperationList().get(0).getAmount());
         Assertions.assertEquals(1234567L, account.getOperationList().get(0).getAccountId());
@@ -43,17 +44,8 @@ public class AccountTest {
                 null);
 
         // When
-        account.deposit(BigDecimal.valueOf(-300L));
-
-        // Then
-        Iterable<Operation> expected = Collections.singletonList(new Operation(
-                null,
-                1234567L,
-                account.getOperationList().get(0).getTimestamp(),
-                BigDecimal.valueOf(300L)));
-        Assertions.assertIterableEquals(expected, account.getOperationList());
-        Assertions.assertEquals(BigDecimal.valueOf(300L), account.getOperationList().get(0).getAmount());
-        Assertions.assertEquals(1234567L, account.getOperationList().get(0).getAccountId());
+        Exception exception = assertThrows(DomainException.class, () -> account.deposit(BigDecimal.valueOf(-300L)));
+        assertEquals("The deposit amount must be positive.", exception.getMessage());
     }
 
     @Test
@@ -64,16 +56,18 @@ public class AccountTest {
                 null);
 
         // When
-        Operation actual = account.withdraw(BigDecimal.valueOf(-200L));
+        Operation actual = account.withdraw(BigDecimal.valueOf(200L));
 
         // Then
         Iterable<Operation> expected = Collections.singletonList(new Operation(
                 null,
                 1234567L,
                 account.getOperationList().get(0).getTimestamp(),
-                BigDecimal.valueOf(-200L)));
+                BigDecimal.valueOf(200L),
+                OperationTypeEnum.WITHDRAWAL));
         Assertions.assertIterableEquals(expected, account.getOperationList());
-        Assertions.assertEquals(BigDecimal.valueOf(-200L), actual.getAmount());
+        Assertions.assertEquals(BigDecimal.valueOf(200L), actual.getAmount());
+        assertEquals(OperationTypeEnum.WITHDRAWAL, actual.getOperationType());
         Assertions.assertEquals(1234567L, actual.getAccountId());
     }
 
@@ -92,9 +86,11 @@ public class AccountTest {
                 null,
                 1234567L,
                 account.getOperationList().get(0).getTimestamp(),
-                BigDecimal.valueOf(-200)));
+                BigDecimal.valueOf(200),
+                OperationTypeEnum.WITHDRAWAL));
         Assertions.assertIterableEquals(expected, account.getOperationList());
-        Assertions.assertEquals(BigDecimal.valueOf(-200L), actual.getAmount());
+        Assertions.assertEquals(BigDecimal.valueOf(200L), actual.getAmount());
+        Assertions.assertEquals(OperationTypeEnum.WITHDRAWAL, actual.getOperationType());
         Assertions.assertEquals(1234567L, actual.getAccountId());
     }
 
@@ -107,7 +103,7 @@ public class AccountTest {
                 operationList);
         // When
         Exception exception = assertThrows(DomainException.class, () -> account.withdraw(BigDecimal.valueOf(301L)));
-        assertEquals("Maximum threshold for withdrawing money exceeded:: you want to retrieve 301 but your balance is 300!", exception.getMessage());
+        assertEquals("Insufficient balance: Withdrawal of 301 is not possible, current balance: 300", exception.getMessage());
     }
 
     @Test
@@ -141,10 +137,10 @@ public class AccountTest {
     }
 
     private List<Operation> createOperationList() {
-        return Arrays.asList(new Operation(null, 123456L, LocalDateTime.now(), BigDecimal.valueOf(200L)),
-                new Operation(null, 123456L, LocalDateTime.now(), BigDecimal.valueOf(500L)),
-                new Operation(null, 123456L, LocalDateTime.now(), BigDecimal.valueOf(-100L)),
-                new Operation(null, 123456L, LocalDateTime.now(), BigDecimal.valueOf(-400L)));
+        return Arrays.asList(new Operation(null, 123456L, LocalDateTime.now(), BigDecimal.valueOf(200L), OperationTypeEnum.DEPOSIT),
+                new Operation(null, 123456L, LocalDateTime.now(), BigDecimal.valueOf(500L), OperationTypeEnum.DEPOSIT),
+                new Operation(null, 123456L, LocalDateTime.now(), BigDecimal.valueOf(100L), OperationTypeEnum.WITHDRAWAL),
+                new Operation(null, 123456L, LocalDateTime.now(), BigDecimal.valueOf(400L), OperationTypeEnum.WITHDRAWAL));
     }
 
 }
