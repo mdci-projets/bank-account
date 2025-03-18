@@ -4,24 +4,32 @@ import com.yma.bank.application.request.NewOperationRequest;
 import com.yma.bank.domain.Account;
 import com.yma.bank.domain.DomainException;
 import com.yma.bank.domain.Operation;
+import com.yma.bank.infrastructure.repository.AccountRepository;
 import com.yma.bank.infrastructure.repository.OperationMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 
-public class OperationServiceImpl implements OperationService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(OperationServiceImpl.class);
+public class AccountServiceImpl implements AccountService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AccountServiceImpl.class);
 
     private final OperationRepository operationRepository;
 
     private final OperationHistoryRepository operationHistoryRepository;
 
+    private final AccountRepository accountRepository;
+
     private final OperationMapper operationMapper;
 
-    public OperationServiceImpl(OperationRepository operationRepository, OperationHistoryRepository operationHistoryRepository, OperationMapper operationMapper) {
+    public AccountServiceImpl(OperationRepository operationRepository,
+                              OperationHistoryRepository operationHistoryRepository,
+                              AccountRepository accountRepository,
+                              OperationMapper operationMapper
+                              ) {
         this.operationRepository = operationRepository;
         this.operationHistoryRepository = operationHistoryRepository;
+        this.accountRepository = accountRepository;
         this.operationMapper = operationMapper;
     }
 
@@ -58,5 +66,11 @@ public class OperationServiceImpl implements OperationService {
         operationHistoryRepository.save(operationMapper.toHistory(operation));
 
         LOGGER.info("Operation successfully recorded for account ID {}", newOperationRequest.getAccountId());
+    }
+
+    public Account getAccount(Long accountId, LocalDateTime baselineDate) {
+        LOGGER.info("Searching for account ID {}", accountId);
+        return accountRepository.getAccount(accountId, baselineDate)
+                .orElseThrow(() -> new DomainException(String.format("Account not found with ID: %s", accountId)));
     }
 }

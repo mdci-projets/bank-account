@@ -3,6 +3,7 @@ package com.yma.bank.infrastructure.configuration;
 import com.yma.bank.BankApplication;
 import com.yma.bank.domain.services.*;
 
+import com.yma.bank.infrastructure.repository.AccountRepository;
 import com.yma.bank.infrastructure.repository.OperationMapper;
 import io.swagger.v3.oas.models.ExternalDocumentation;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -18,8 +19,11 @@ import org.springframework.context.annotation.Configuration;
 public class BeanConfiguration {
 
     @Bean
-    OperationService operationService(final OperationRepository operationRepository, final OperationHistoryRepository operationHistoryRepository, final OperationMapper operationMapper) {
-        return new OperationServiceImpl(operationRepository, operationHistoryRepository, operationMapper);
+    AccountService operationService(final OperationRepository operationRepository,
+                                    final OperationHistoryRepository operationHistoryRepository,
+                                    final AccountRepository accountRepository,
+                                    final OperationMapper operationMapper) {
+        return new AccountServiceImpl(operationRepository, operationHistoryRepository, accountRepository, operationMapper);
     }
 
     @Bean

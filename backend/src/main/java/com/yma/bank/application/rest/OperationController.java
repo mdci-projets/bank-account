@@ -2,7 +2,7 @@ package com.yma.bank.application.rest;
 
 import com.yma.bank.application.request.NewOperationRequest;
 import com.yma.bank.domain.OperationTypeEnum;
-import com.yma.bank.domain.services.OperationService;
+import com.yma.bank.domain.services.AccountService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,10 +24,10 @@ import java.math.BigDecimal;
 public class OperationController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OperationController.class);
-    private final OperationService operationService;
+    private final AccountService accountService;
 
-    public OperationController(OperationService operationService) {
-        this.operationService = operationService;
+    public OperationController(AccountService accountService) {
+        this.accountService = accountService;
     }
 
     /**
@@ -51,7 +51,7 @@ public class OperationController {
 
         LOGGER.info("Deposit request for account ID {} of amount {}", accountId, amount);
 
-        operationService.sendMoney(new NewOperationRequest(accountId, amount, OperationTypeEnum.DEPOSIT));
+        accountService.sendMoney(new NewOperationRequest(accountId, amount, OperationTypeEnum.DEPOSIT));
 
         LOGGER.info("Deposit successful for account ID {}", accountId);
         return ResponseEntity.ok("Deposit successful");
@@ -79,7 +79,7 @@ public class OperationController {
 
         LOGGER.info("Withdrawal request for account ID {} of amount {}", accountId, amount);
 
-        operationService.sendMoney(new NewOperationRequest(accountId, amount, OperationTypeEnum.WITHDRAWAL));
+        accountService.sendMoney(new NewOperationRequest(accountId, amount, OperationTypeEnum.WITHDRAWAL));
 
         LOGGER.info("Withdrawal successful for account ID {}", accountId);
         return ResponseEntity.ok("Withdrawal successful");
