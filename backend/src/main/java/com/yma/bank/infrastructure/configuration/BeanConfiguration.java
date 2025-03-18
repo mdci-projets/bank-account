@@ -1,9 +1,7 @@
 package com.yma.bank.infrastructure.configuration;
 
 import com.yma.bank.BankApplication;
-import com.yma.bank.domain.services.OperationServiceImpl;
-import com.yma.bank.domain.services.OperationRepository;
-import com.yma.bank.domain.services.OperationService;
+import com.yma.bank.domain.services.*;
 
 import io.swagger.v3.oas.models.ExternalDocumentation;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -21,6 +19,16 @@ public class BeanConfiguration {
     @Bean
     OperationService operationService(final OperationRepository operationRepository) {
         return new OperationServiceImpl(operationRepository);
+    }
+
+    @Bean
+    public StatementDomainService statementDomainService() {
+        return new StatementDomainService();
+    }
+
+    @Bean
+    StatementService statementService(final OperationHistoryRepository operationHistoryRepository, final StatementDomainService statementDomainService) {
+        return new StatementServiceImpl(operationHistoryRepository, statementDomainService);
     }
 
     @Bean
