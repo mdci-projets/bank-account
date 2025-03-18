@@ -7,6 +7,5 @@ import java.time.LocalDateTime;
 
 public interface OperationRepository {
     void saveOperation(Operation operation);
-
     Account getAccount(Long accountId, LocalDateTime baselineDate);
 }

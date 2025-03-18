@@ -4,9 +4,12 @@ import com.yma.bank.domain.OperationHistory;
 import com.yma.bank.domain.OperationTypeEnum;
 import com.yma.bank.domain.services.OperationHistoryRepository;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -14,8 +17,10 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SpringBootTest
-@Transactional
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {RepositoryTestConfiguration.class})
+@DataJpaTest
+@ActiveProfiles("test")
 class OperationHistoryRepositoryImplTest {
 
     @Autowired

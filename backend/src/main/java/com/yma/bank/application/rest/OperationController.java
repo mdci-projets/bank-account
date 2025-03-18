@@ -1,7 +1,6 @@
 package com.yma.bank.application.rest;
 
 import com.yma.bank.application.request.NewOperationRequest;
-import com.yma.bank.application.response.AccountStatementResponse;
 import com.yma.bank.domain.OperationTypeEnum;
 import com.yma.bank.domain.services.OperationService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 /**
  * REST Controller for managing bank operations (deposit, withdrawal, transaction history).
@@ -85,29 +83,5 @@ public class OperationController {
 
         LOGGER.info("Withdrawal successful for account ID {}", accountId);
         return ResponseEntity.ok("Withdrawal successful");
-    }
-
-    /**
-     * Retrieve the account transaction history.
-     *
-     * @param accountId The ID of the account.
-     * @return AccountStatementResponse containing the transaction history.
-     */
-    @Operation(summary = "Get account transaction history",
-            description = "Retrieves the transaction history for a specified account.",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Transaction history retrieved successfully"),
-                    @ApiResponse(responseCode = "404", description = "Account not found")
-            })
-    @GetMapping("/{accountId}/operations")
-    public ResponseEntity<AccountStatementResponse> getAccountStatement(
-            @Parameter(description = "Bank account ID") @PathVariable Long accountId) {
-
-        LOGGER.info("Retrieving transaction history for account ID {}", accountId);
-
-        AccountStatementResponse response = operationService.getAccountStatement(accountId, LocalDateTime.now().minusDays(10));
-
-        LOGGER.info("Transaction history retrieved for account ID {}", accountId);
-        return ResponseEntity.ok(response);
     }
 }

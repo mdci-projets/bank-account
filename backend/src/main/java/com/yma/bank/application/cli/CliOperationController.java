@@ -4,6 +4,7 @@ import com.yma.bank.application.request.NewOperationRequest;
 import com.yma.bank.application.response.AccountStatementResponse;
 import com.yma.bank.domain.OperationTypeEnum;
 import com.yma.bank.domain.services.OperationService;
+import com.yma.bank.domain.services.StatementService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +21,16 @@ public class CliOperationController implements CommandLineRunner {
     private static final Logger LOG = LoggerFactory.getLogger(CliOperationController.class);
 
     private final OperationService operationService;
+
+    private final StatementService statementService;
+
     private final ConsoleStatementPrinter consoleStatementPrinter;
 
     @Autowired
-    public CliOperationController(OperationService operationService, ConsoleStatementPrinter consoleStatementPrinter) {
+    public CliOperationController(OperationService operationService, ConsoleStatementPrinter consoleStatementPrinter, StatementService statementService) {
         this.operationService = operationService;
         this.consoleStatementPrinter = consoleStatementPrinter;
+        this.statementService = statementService;
     }
 
     public void deposit() {
@@ -51,7 +56,7 @@ public class CliOperationController implements CommandLineRunner {
     }
 
     public AccountStatementResponse getAccountStatement(Long accountId) {
-        return operationService.getAccountStatement(accountId, LocalDateTime.now().minusDays(10));
+        return statementService.generateAccountStatement(accountId, LocalDateTime.now().minusDays(10));
     }
 
     public void printAccountStatement(AccountStatementResponse accountStatementResponse, StatementPrinter printer) {

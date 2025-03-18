@@ -2,9 +2,9 @@ package com.yma.bank.domain.services;
 
 import com.yma.bank.application.response.AccountStatementResponse;
 import com.yma.bank.application.response.StatementLine;
+import com.yma.bank.domain.DomainException;
 import com.yma.bank.domain.OperationHistory;
 import com.yma.bank.domain.OperationTypeEnum;
-import com.yma.bank.domain.DomainException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
