@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,6 +48,20 @@ public class AccountRepositoryImpl implements AccountRepository {
 
         LOGGER.info("Balances retrieved for account ID {}: Withdrawals={}, Deposits={}", accountId, withdrawalBalance, depositBalance);
         return Optional.of(accountMapper.mapToDomainEntity(account, operationEntityList, withdrawalBalance, depositBalance));
+    }
+
+    @Override
+    public List<Account> getAllAccounts(LocalDateTime baselineDate) {
+        List<AccountEntity> accountsEntities = accountEntityRepository.findAll();
+
+        List<Account> accounts = new ArrayList<>();
+        accountsEntities.forEach(accountEntity -> {
+            List<OperationEntity> operationEntityList = operationEntityRepository.findByAccountIdSince(accountEntity.getAccountId(), baselineDate);
+            Long withdrawalBalance = getSafeBalance(operationEntityRepository.getWithdrawalBalanceUntil(accountEntity.getAccountId(), baselineDate));
+            Long depositBalance = getSafeBalance(operationEntityRepository.getDepositBalanceUntil(accountEntity.getAccountId(), baselineDate));
+            accounts.add(accountMapper.mapToDomainEntity(accountEntity, operationEntityList, withdrawalBalance, depositBalance));
+        });
+        return accounts;
     }
 
     private static Long getSafeBalance(Long value) {

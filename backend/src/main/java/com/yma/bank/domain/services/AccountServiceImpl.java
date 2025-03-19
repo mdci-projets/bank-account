@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class AccountServiceImpl implements AccountService {
     private static final Logger LOGGER = LoggerFactory.getLogger(AccountServiceImpl.class);
@@ -74,5 +75,9 @@ public class AccountServiceImpl implements AccountService {
                 .orElseThrow(() -> new DomainException(String.format("Account not found with ID: %s", accountId)));
     }
 
-
+    @Override
+    public List<Account> getAllAccounts(LocalDateTime baselineDate) {
+        LOGGER.info("Searching all accounts");
+        return accountRepository.getAllAccounts(baselineDate);
+    }
 }
