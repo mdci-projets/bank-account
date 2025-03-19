@@ -3,7 +3,7 @@ package com.yma.bank.infrastructure.configuration;
 import com.yma.bank.BankApplication;
 import com.yma.bank.domain.services.*;
 
-import com.yma.bank.infrastructure.repository.AccountRepository;
+import com.yma.bank.domain.services.AccountRepository;
 import com.yma.bank.infrastructure.repository.OperationMapper;
 import io.swagger.v3.oas.models.ExternalDocumentation;
 import io.swagger.v3.oas.models.OpenAPI;

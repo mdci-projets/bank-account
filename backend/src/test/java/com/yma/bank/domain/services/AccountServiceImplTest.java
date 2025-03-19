@@ -2,7 +2,6 @@ package com.yma.bank.domain.services;
 
 import com.yma.bank.application.request.NewOperationRequest;
 import com.yma.bank.domain.*;
-import com.yma.bank.infrastructure.repository.AccountRepository;
 import com.yma.bank.infrastructure.repository.OperationMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,7 +57,7 @@ public class AccountServiceImplTest {
 
     @Test
     void shouldThrowDomainExceptionWhenAccountNotFound() {
-        when(operationRepository.getAccount(anyLong(), any())).thenThrow(new DomainException("Account not found"));
+        when(accountRepository.getAccount(anyLong(), any())).thenThrow(new DomainException("Account not found"));
 
         Exception exception = assertThrows(DomainException.class, () -> accountService.sendMoney(request));
         assertEquals("Account not found", exception.getMessage());
@@ -66,11 +65,11 @@ public class AccountServiceImplTest {
 
     @Test
     void shouldProcessDepositSuccessfully() {
-        when(operationRepository.getAccount(anyLong(), any())).thenReturn(account);
+        when(accountRepository.getAccount(anyLong(), any())).thenReturn(Optional.of(account));
 
         accountService.sendMoney(request);
 
-        verify(operationRepository, times(1)).getAccount(anyLong(), any());
+        verify(accountRepository, times(1)).getAccount(anyLong(), any());
         verify(operationRepository, times(1)).saveOperation(any(Operation.class));
         verify(operationHistoryRepository, times(1)).save(any(OperationHistory.class));
     }
@@ -82,13 +81,13 @@ public class AccountServiceImplTest {
         Account account = new Account(newOperationRequest.getAccountId(),
                 BigDecimal.ZERO,
                 new ArrayList<>());
-        when(operationRepository.getAccount(any(Long.class), any(LocalDateTime.class))).thenReturn(account);
+        when(accountRepository.getAccount(any(Long.class), any(LocalDateTime.class))).thenReturn(Optional.of(account));
 
         // When
         accountService.sendMoney(newOperationRequest);
 
         // Then
-        verify(operationRepository).getAccount(any(Long.class), any(LocalDateTime.class));
+        verify(accountRepository).getAccount(any(Long.class), any(LocalDateTime.class));
         verify(operationRepository).saveOperation(any(Operation.class));
         verify(operationHistoryRepository, times(1)).save(any(OperationHistory.class));
         Assertions.assertEquals(BigDecimal.valueOf(200L), account.getOperationList().get(0).getAmount());
@@ -99,7 +98,7 @@ public class AccountServiceImplTest {
     public void sendMoneyDepositWhenAccountClientNotExistsTest() {
         // Given
         final NewOperationRequest newOperationRequest = new NewOperationRequest(1234567L, BigDecimal.valueOf(200L), OperationTypeEnum.DEPOSIT);
-        when(operationRepository.getAccount(eq(1234567L), any(LocalDateTime.class))).thenThrow(new DomainException("Account with %s number not found"));
+        when(accountRepository.getAccount(eq(1234567L), any(LocalDateTime.class))).thenThrow(new DomainException("Account with %s number not found"));
 
         // When
         Exception exception = assertThrows(DomainException.class, () -> accountService.sendMoney(newOperationRequest));
@@ -113,13 +112,13 @@ public class AccountServiceImplTest {
         Account account = new Account(newOperationRequest.getAccountId(),
                 BigDecimal.valueOf(300L),
                 new ArrayList<>());
-        when(operationRepository.getAccount(any(Long.class), any(LocalDateTime.class))).thenReturn(account);
+        when(accountRepository.getAccount(any(Long.class), any(LocalDateTime.class))).thenReturn(Optional.of(account));
 
         // When
         accountService.sendMoney(newOperationRequest);
 
         // Then
-        verify(operationRepository).getAccount(any(Long.class), any(LocalDateTime.class));
+        verify(accountRepository).getAccount(any(Long.class), any(LocalDateTime.class));
         verify(operationRepository).saveOperation(any(Operation.class));
         verify(operationHistoryRepository, times(1)).save(any(OperationHistory.class));
         Assertions.assertEquals(BigDecimal.valueOf(200L), account.getOperationList().get(0).getAmount());

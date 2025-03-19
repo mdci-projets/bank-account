@@ -1,4 +1,4 @@
-package com.yma.bank.infrastructure.repository;
+package com.yma.bank.domain.services;
 
 import com.yma.bank.domain.Account;
 

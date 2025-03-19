@@ -2,6 +2,7 @@ package com.yma.bank.infrastructure.repository;
 
 import com.yma.bank.domain.Account;
 import com.yma.bank.domain.DomainException;
+import com.yma.bank.domain.services.AccountRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;

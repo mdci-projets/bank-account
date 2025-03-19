@@ -4,7 +4,6 @@ import com.yma.bank.application.request.NewOperationRequest;
 import com.yma.bank.domain.Account;
 import com.yma.bank.domain.DomainException;
 import com.yma.bank.domain.Operation;
-import com.yma.bank.infrastructure.repository.AccountRepository;
 import com.yma.bank.infrastructure.repository.OperationMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +47,7 @@ public class AccountServiceImpl implements AccountService {
         LOGGER.info("Processing transaction for account ID: {}", newOperationRequest.getAccountId());
 
         LocalDateTime baselineDate = LocalDateTime.now().minusDays(10);
-        Account account = operationRepository.getAccount(
+        Account account = getAccount(
                 newOperationRequest.getAccountId(),
                 baselineDate);
 
@@ -68,9 +67,12 @@ public class AccountServiceImpl implements AccountService {
         LOGGER.info("Operation successfully recorded for account ID {}", newOperationRequest.getAccountId());
     }
 
+    @Override
     public Account getAccount(Long accountId, LocalDateTime baselineDate) {
         LOGGER.info("Searching for account ID {}", accountId);
         return accountRepository.getAccount(accountId, baselineDate)
                 .orElseThrow(() -> new DomainException(String.format("Account not found with ID: %s", accountId)));
     }
+
+
 }
