@@ -3,7 +3,7 @@ package com.yma.bank.application.cli;
 import com.yma.bank.application.request.NewOperationRequest;
 import com.yma.bank.application.response.AccountStatementResponse;
 import com.yma.bank.domain.OperationTypeEnum;
-import com.yma.bank.domain.services.OperationService;
+import com.yma.bank.domain.services.AccountService;
 import com.yma.bank.domain.services.StatementService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,15 +20,15 @@ import java.time.LocalDateTime;
 public class CliOperationController implements CommandLineRunner {
     private static final Logger LOG = LoggerFactory.getLogger(CliOperationController.class);
 
-    private final OperationService operationService;
+    private final AccountService accountService;
 
     private final StatementService statementService;
 
     private final ConsoleStatementPrinter consoleStatementPrinter;
 
     @Autowired
-    public CliOperationController(OperationService operationService, ConsoleStatementPrinter consoleStatementPrinter, StatementService statementService) {
-        this.operationService = operationService;
+    public CliOperationController(AccountService accountService, ConsoleStatementPrinter consoleStatementPrinter, StatementService statementService) {
+        this.accountService = accountService;
         this.consoleStatementPrinter = consoleStatementPrinter;
         this.statementService = statementService;
     }
@@ -52,7 +52,7 @@ public class CliOperationController implements CommandLineRunner {
     private void createOperation(Long accountId, BigDecimal amount, OperationTypeEnum operationTypeEnum) {
         LOG.info(String.format("%s a amount of %s for my account %s", operationTypeEnum, amount, accountId));
         NewOperationRequest newOperationRequest = new NewOperationRequest(accountId, amount, operationTypeEnum);
-        operationService.sendMoney(newOperationRequest);
+        accountService.sendMoney(newOperationRequest);
     }
 
     public AccountStatementResponse getAccountStatement(Long accountId) {
