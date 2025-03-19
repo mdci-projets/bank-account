@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 
 @RestController
-@RequestMapping("/statements")
+@RequestMapping("/api/statement")
 @Tag(name = "Banking Statements", description = "API to manage account statements")
 public class StatementController {
     private static final Logger LOGGER = LoggerFactory.getLogger(StatementController.class);

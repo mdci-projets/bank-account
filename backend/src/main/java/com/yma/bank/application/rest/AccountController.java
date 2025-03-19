@@ -24,7 +24,7 @@ import java.time.LocalDateTime;
  * Uses Swagger for API documentation and logging for monitoring.
  */
 @RestController
-@RequestMapping("/account")
+@RequestMapping("/api/account")
 @Tag(name = "Banking Operations", description = "API to manage account transactions")
 public class AccountController {
 
