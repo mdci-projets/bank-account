@@ -38,6 +38,6 @@ public class ConsoleStatementPrinter implements StatementPrinter {
     }
 
     private void printHeader(PrintStream printer) {
-        printer.println("DATE                      |    Operation   |   AMOUNT   |   BALANCE");
+        printer.println("DATE                      |    Operation   |   AMOUNT    |   BALANCE");
     }
 }
