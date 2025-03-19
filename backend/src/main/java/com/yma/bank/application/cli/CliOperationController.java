@@ -1,8 +1,8 @@
 package com.yma.bank.application.cli;
 
 import com.yma.bank.application.request.NewOperationRequest;
+import com.yma.bank.application.response.AccountDTO;
 import com.yma.bank.application.response.AccountStatementResponse;
-import com.yma.bank.domain.Account;
 import com.yma.bank.domain.OperationTypeEnum;
 import com.yma.bank.domain.services.AccountService;
 import com.yma.bank.domain.services.StatementService;
@@ -123,6 +123,7 @@ public class CliOperationController implements CommandLineRunner {
             }
         }
     }
+
     private void displayMenu() {
         System.out.println("\n===== Banking CLI Menu =====");
         System.out.println("1. Deposit money");
@@ -133,14 +134,14 @@ public class CliOperationController implements CommandLineRunner {
 
     private void displayTestAccounts() {
         try {
-            List<Account> accounts = accountService.getAllAccounts(LocalDateTime.now());
+            List<AccountDTO> accounts = accountService.getAllAccounts(LocalDateTime.now());
             System.out.println("\n**Test Accounts Available:**");
             if (accounts.isEmpty()) {
                 System.out.println("⚠ No test accounts found. Please create an account first.");
             } else {
-                for (Account account : accounts) {
-                    System.out.println("🔹 Account ID: " + account.getAccountId().orElse(null) +
-                            " | Balance: " + account.getBaseLineBalance());
+                for (AccountDTO account : accounts) {
+                    System.out.println("🔹 Account ID: " + account.getAccountId() +
+                            " | Balance: " + account.getBalance());
                 }
             }
         } catch (Exception e) {
@@ -179,7 +180,7 @@ public class CliOperationController implements CommandLineRunner {
         Long accountId = cliService.readLong("Enter account ID: ");
 
         try {
-            AccountStatementResponse statement = statementService.generateAccountStatement(accountId, LocalDateTime.now().minusDays(10));
+            AccountStatementResponse statement = statementService.generateAccountStatement(accountId, LocalDateTime.now());
             consoleStatementPrinter.print(statement);
             System.out.println("✅ Account statement displayed successfully.");
         } catch (Exception e) {

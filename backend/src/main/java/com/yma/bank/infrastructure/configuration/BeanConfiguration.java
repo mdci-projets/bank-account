@@ -50,7 +50,7 @@ public class BeanConfiguration {
                                 .name("Apache 2.0")
                                 .url("https://www.apache.org/licenses/LICENSE-2.0")))
                 .externalDocs(new ExternalDocumentation()
-                        .description("Documentation Complète")
+                        .description("Complete Documentation")
                         .url("https://bankapi.com/docs"));
     }
 }

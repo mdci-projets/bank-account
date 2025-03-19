@@ -1,6 +1,7 @@
 package com.yma.bank.domain.services;
 
 import com.yma.bank.application.request.NewOperationRequest;
+import com.yma.bank.application.response.AccountDTO;
 import com.yma.bank.domain.*;
 import com.yma.bank.infrastructure.repository.OperationMapper;
 import org.junit.jupiter.api.Assertions;
@@ -132,10 +133,10 @@ public class AccountServiceImplTest {
         Account expectedAccount = new Account(1234567L, new BigDecimal("500.00"), null);
         when(accountRepository.getAccount(1234567L, baseLineDate)).thenReturn(Optional.of(expectedAccount));
 
-        Account retrievedAccount = accountService.getAccount(1234567L, baseLineDate);
+        AccountDTO retrievedAccount = accountService.getAccount(1234567L, baseLineDate);
 
-        assertEquals(1234567L, retrievedAccount.getAccountId().get());
-        assertEquals(new BigDecimal("500.00"), retrievedAccount.getBaseLineBalance());
+        assertEquals(1234567L, retrievedAccount.getAccountId());
+        assertEquals(new BigDecimal("500.00"), retrievedAccount.getBalance());
     }
 
     @Test

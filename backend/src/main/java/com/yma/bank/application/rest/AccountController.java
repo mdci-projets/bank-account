@@ -1,16 +1,17 @@
 package com.yma.bank.application.rest;
 
 import com.yma.bank.application.request.NewOperationRequest;
-import com.yma.bank.domain.Account;
+import com.yma.bank.application.response.AccountDTO;
 import com.yma.bank.domain.OperationTypeEnum;
 import com.yma.bank.domain.services.AccountService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * REST Controller for managing bank operations (deposit, withdrawal, transaction history).
@@ -90,19 +92,19 @@ public class AccountController {
         return ResponseEntity.ok("Withdrawal successful");
     }
 
-    @Operation(summary = "Retrieve an account by its ID",
+    @Operation(summary = "Retrieve an account by its account ID",
             description = "Fetches an account based on the provided account ID and baseline date.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Account found",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = Account.class))),
+                            schema = @Schema(implementation = AccountDTO.class))),
             @ApiResponse(responseCode = "404", description = "Account not found",
                     content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "400", description = "Invalid request parameters",
                     content = @Content(mediaType = "application/json"))
     })
     @GetMapping("/{accountId}")
-    public Account getAccount(
+    public AccountDTO getAccount(
             @Parameter(description = "ID of the account to retrieve", example = "121")
             @PathVariable Long accountId,
 
@@ -110,6 +112,25 @@ public class AccountController {
                     example = "2025-03-16T14:00:00")
             @RequestParam(required = false) LocalDateTime baselineDate) {
 
-        return accountService.getAccount(accountId, baselineDate != null ? baselineDate : LocalDateTime.now().minusDays(10));
+        return accountService.getAccount(accountId, baselineDate != null ? baselineDate : LocalDateTime.now());
+    }
+
+    @Operation(
+            summary = "Retrieve all accounts",
+            description = "Returns a list of all accounts with their current balance. An optional parameter allows specifying a reference date for account history."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved the list of accounts",
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = AccountDTO.class)))),
+            @ApiResponse(responseCode = "400", description = "Invalid request"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @GetMapping
+    public List<AccountDTO> getAllAccounts(
+            @Parameter(description = "Reference date for account history",
+                    example = "2025-03-16T14:00:00")
+            @RequestParam(required = false) LocalDateTime baselineDate) {
+
+        return accountService.getAllAccounts(baselineDate != null ? baselineDate : LocalDateTime.now());
     }
 }

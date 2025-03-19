@@ -28,7 +28,7 @@ public class StatementController {
      * Retrieve the account transaction history.
      *
      * @param accountId The ID of the account.
-     * @param fromDateString Start date for the bank statement.
+     * @param baselineDate Start date for the bank statement.
      * @return AccountStatementResponse containing the transaction history.
      */
     @Operation(summary = "Get account transaction history",
@@ -40,12 +40,13 @@ public class StatementController {
     @GetMapping("/{accountId}")
     public ResponseEntity<AccountStatementResponse> getAccountStatement(
             @Parameter(description = "Bank account ID") @PathVariable Long accountId,
-            @Parameter(description = "Start date for the bank statement") @RequestParam("fromDate") String fromDateString
+            @Parameter(description = "Start date for the bank statement",
+                    example = "2025-03-16T14:00:00" ) @RequestParam(required = false) LocalDateTime baselineDate
             ) {
 
         LOGGER.info("Retrieving transaction history for account ID {}", accountId);
 
-        AccountStatementResponse response = statementService.generateAccountStatement(accountId, fromDateString != null ? LocalDateTime.parse(fromDateString) : LocalDateTime.now().minusDays(10));
+        AccountStatementResponse response = statementService.generateAccountStatement(accountId, baselineDate != null ? baselineDate : LocalDateTime.now().minusDays(10));
 
         LOGGER.info("Transaction history retrieved for account ID {}", accountId);
         return ResponseEntity.ok(response);

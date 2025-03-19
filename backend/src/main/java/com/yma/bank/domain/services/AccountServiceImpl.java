@@ -1,6 +1,7 @@
 package com.yma.bank.domain.services;
 
 import com.yma.bank.application.request.NewOperationRequest;
+import com.yma.bank.application.response.AccountDTO;
 import com.yma.bank.domain.Account;
 import com.yma.bank.domain.DomainException;
 import com.yma.bank.domain.Operation;
@@ -9,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public class AccountServiceImpl implements AccountService {
@@ -48,11 +50,9 @@ public class AccountServiceImpl implements AccountService {
         LOGGER.info("Processing transaction for account ID: {}", newOperationRequest.getAccountId());
 
         LocalDateTime baselineDate = LocalDateTime.now().minusDays(10);
-        Account account = getAccount(
+        Account account = accountRepository.getAccount(
                 newOperationRequest.getAccountId(),
-                baselineDate);
-
-        account.getAccountId()
+                baselineDate)
                 .orElseThrow(() -> new DomainException(String.format("Account with %s number not found", newOperationRequest.getAccountId())));
 
         Operation operation;
@@ -69,15 +69,21 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Account getAccount(Long accountId, LocalDateTime baselineDate) {
+    public AccountDTO getAccount(Long accountId, LocalDateTime baselineDate) {
         LOGGER.info("Searching for account ID {}", accountId);
-        return accountRepository.getAccount(accountId, baselineDate)
-                .orElseThrow(() -> new DomainException(String.format("Account not found with ID: %s", accountId)));
+        Account account = accountRepository.getAccount(accountId, baselineDate)
+                .orElseThrow(() -> new DomainException("Account with ID %s not found" + accountId));
+
+        return new AccountDTO(account.getAccountId().orElse(null), account.getBaseLineBalance());
     }
 
     @Override
-    public List<Account> getAllAccounts(LocalDateTime baselineDate) {
+    public List<AccountDTO> getAllAccounts(LocalDateTime baselineDate) {
         LOGGER.info("Searching all accounts");
-        return accountRepository.getAllAccounts(baselineDate);
+        List<AccountDTO> accountDTOs = new ArrayList<>();
+        accountRepository.getAllAccounts(baselineDate).forEach(account -> {
+            accountDTOs.add(new AccountDTO(account.getAccountId().orElse(null), account.getBaseLineBalance()));
+        });
+        return accountDTOs;
     }
 }
